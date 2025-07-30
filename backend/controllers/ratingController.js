@@ -1,5 +1,5 @@
 // File: backend/controllers/ratingController.js
-const pool = require("../config/database");
+const { supabase } = require("../config/database");
 
 const ratingController = {
   // Submit rating
@@ -8,7 +8,7 @@ const ratingController = {
       const { article_id } = req.params;
       const { rating, feedback } = req.body;
 
-      // Get user IP with better detection
+      // Get user IP
       const user_ip = req.ip || req.connection.remoteAddress || req.socket.remoteAddress || (req.connection.socket ? req.connection.socket.remoteAddress : "127.0.0.1");
 
       console.log("Rating submission:", { article_id, rating, feedback, user_ip });
@@ -22,29 +22,53 @@ const ratingController = {
       }
 
       // Check if article exists
-      const articleCheck = await pool.query("SELECT id FROM articles WHERE id = $1", [article_id]);
+      const { data: articleData, error: articleError } = await supabase.from("articles").select("id").eq("id", article_id).maybeSingle();
 
-      if (articleCheck.rows.length === 0) {
+      if (articleError || !articleData) {
         return res.status(404).json({
           success: false,
           message: "Article not found",
         });
       }
 
-      // Insert or update rating
-      const result = await pool.query(
-        `
-        INSERT INTO ratings (article_id, user_ip, rating, feedback)
-        VALUES ($1, $2, $3, $4)
-        ON CONFLICT (article_id, user_ip)
-        DO UPDATE SET 
-          rating = EXCLUDED.rating,
-          feedback = EXCLUDED.feedback,
-          created_at = CURRENT_TIMESTAMP
-        RETURNING *
-      `,
-        [article_id, user_ip, rating, feedback || null]
-      );
+      // Check if rating already exists for this IP and article
+      const { data: existingRating, error: checkError } = await supabase.from("ratings").select("*").eq("article_id", article_id).eq("user_ip", user_ip).maybeSingle();
+
+      if (checkError) throw checkError;
+
+      let result;
+
+      if (existingRating) {
+        // Update
+        const { data, error } = await supabase
+          .from("ratings")
+          .update({
+            rating,
+            feedback,
+            created_at: new Date().toISOString(),
+          })
+          .eq("id", existingRating.id)
+          .select()
+          .single();
+
+        if (error) throw error;
+        result = data;
+      } else {
+        // Insert
+        const { data, error } = await supabase
+          .from("ratings")
+          .insert({
+            article_id,
+            user_ip,
+            rating,
+            feedback,
+          })
+          .select()
+          .single();
+
+        if (error) throw error;
+        result = data;
+      }
 
       // Update article average rating
       await updateArticleAverageRating(article_id);
@@ -52,10 +76,10 @@ const ratingController = {
       res.json({
         success: true,
         message: "Rating submitted successfully",
-        data: result.rows[0],
+        data: result,
       });
     } catch (error) {
-      console.error("Error submitting rating:", error);
+      console.error("Error submitting rating:", error.message);
       res.status(500).json({
         success: false,
         message: "Internal server error",
@@ -70,59 +94,45 @@ const ratingController = {
       const { article_id } = req.params;
       const page = parseInt(req.query.page) || 1;
       const limit = parseInt(req.query.limit) || 10;
-      const offset = (page - 1) * limit;
+      const from = (page - 1) * limit;
+      const to = from + limit - 1;
 
-      console.log("Getting ratings for article:", article_id);
+      // Get paginated ratings
+      const { data: ratings, error } = await supabase.from("ratings").select("id, rating, feedback, created_at, user_ip").eq("article_id", article_id).order("created_at", { ascending: false }).range(from, to);
 
-      // Get ratings with pagination
-      const result = await pool.query(
-        `
-        SELECT 
-          id,
-          rating,
-          feedback,
-          created_at,
-          SUBSTRING(user_ip, 1, 3) || '.*.*.*' as masked_ip
-        FROM ratings 
-        WHERE article_id = $1 
-        ORDER BY created_at DESC
-        LIMIT $2 OFFSET $3
-      `,
-        [article_id, limit, offset]
-      );
+      if (error) throw error;
 
-      // Get total count
-      const countResult = await pool.query("SELECT COUNT(*) FROM ratings WHERE article_id = $1", [article_id]);
+      // Mask user IP
+      const maskedRatings = ratings.map((r) => ({
+        ...r,
+        masked_ip: r.user_ip ? r.user_ip.substring(0, 3) + ".*.*.*" : "xxx.*.*.*",
+      }));
 
-      // Get rating distribution
-      const distributionResult = await pool.query(
-        `
-        SELECT 
-          rating,
-          COUNT(*) as count
-        FROM ratings 
-        WHERE article_id = $1 
-        GROUP BY rating
-        ORDER BY rating DESC
-      `,
-        [article_id]
-      );
+      // Get total
+      const { count: total, error: countError } = await supabase.from("ratings").select("*", { count: "exact", head: true }).eq("article_id", article_id);
+
+      if (countError) throw countError;
+
+      // Get distribution
+      const { data: distributionData, error: distError } = await supabase.from("ratings").select("rating, count:rating").eq("article_id", article_id).group("rating");
+
+      if (distError) throw distError;
 
       res.json({
         success: true,
         data: {
-          ratings: result.rows,
-          total: parseInt(countResult.rows[0].count),
-          distribution: distributionResult.rows,
+          ratings: maskedRatings,
+          total,
+          distribution: distributionData,
           pagination: {
             page,
             limit,
-            totalPages: Math.ceil(countResult.rows[0].count / limit),
+            totalPages: Math.ceil(total / limit),
           },
         },
       });
     } catch (error) {
-      console.error("Error getting ratings:", error);
+      console.error("Error getting ratings:", error.message);
       res.status(500).json({
         success: false,
         message: "Internal server error",
@@ -139,14 +149,16 @@ const ratingController = {
 
       console.log("Getting user rating for article:", article_id, "IP:", user_ip);
 
-      const result = await pool.query("SELECT rating, feedback FROM ratings WHERE article_id = $1 AND user_ip = $2", [article_id, user_ip]);
+      const { data, error } = await supabase.from("ratings").select("rating, feedback").eq("article_id", article_id).eq("user_ip", user_ip).maybeSingle();
+
+      if (error) throw error;
 
       res.json({
         success: true,
-        data: result.rows[0] || null,
+        data: data || null,
       });
     } catch (error) {
-      console.error("Error getting user rating:", error);
+      console.error("Error getting user rating:", error.message);
       res.status(500).json({
         success: false,
         message: "Internal server error",
@@ -156,31 +168,29 @@ const ratingController = {
   },
 };
 
-// Helper function to update article average rating
+// Helper: Update average and total rating
 async function updateArticleAverageRating(articleId) {
   try {
-    const result = await pool.query(
-      `
-      UPDATE articles 
-      SET 
-        average_rating = (
-          SELECT ROUND(AVG(rating)::numeric, 2) 
-          FROM ratings 
-          WHERE article_id = $1
-        ),
-        total_ratings = (
-          SELECT COUNT(*) 
-          FROM ratings 
-          WHERE article_id = $1
-        )
-      WHERE id = $1
-    `,
-      [articleId]
-    );
+    const { data: ratings, error } = await supabase.from("ratings").select("rating").eq("article_id", articleId);
 
-    console.log("Updated article rating for article:", articleId);
+    if (error) throw error;
+
+    const values = ratings.map((r) => r.rating);
+    const average = values.length ? Math.round((values.reduce((a, b) => a + b, 0) / values.length) * 100) / 100 : 0;
+
+    const { error: updateError } = await supabase
+      .from("articles")
+      .update({
+        average_rating: average,
+        total_ratings: values.length,
+      })
+      .eq("id", articleId);
+
+    if (updateError) throw updateError;
+
+    console.log("Updated article average rating for article:", articleId);
   } catch (error) {
-    console.error("Error updating article average rating:", error);
+    console.error("Error updating article average rating:", error.message);
   }
 }
 

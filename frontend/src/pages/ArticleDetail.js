@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { articleService } from "../services/articleService";
-// ✅ 1. TAMBAHKAN IMPORT BARU DI SINI:
 import RatingDisplay from "../components/rating/RatingDisplay";
 import RatingInput from "../components/rating/RatingInput";
 import { ratingService } from "../services/ratingService";
@@ -13,8 +12,7 @@ const ArticleDetail = () => {
   const [article, setArticle] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  // ✅ 2. TAMBAHKAN STATE RATING BARU DI SINI:
+  const [submitSuccess, setSubmitSuccess] = useState(false);
   const [userRating, setUserRating] = useState(null);
   const [ratings, setRatings] = useState([]);
   const [ratingStats, setRatingStats] = useState(null);
@@ -23,7 +21,6 @@ const ArticleDetail = () => {
     loadArticle();
   }, [id]);
 
-  // ✅ 3. TAMBAHKAN useEffect BARU DI SINI:
   useEffect(() => {
     if (article) {
       loadUserRating();
@@ -45,7 +42,6 @@ const ArticleDetail = () => {
     }
   };
 
-  // ✅ 4. TAMBAHKAN FUNGSI RATING BARU DI SINI:
   const loadUserRating = async () => {
     try {
       const response = await ratingService.getUserRating(id);
@@ -315,7 +311,6 @@ const ArticleDetail = () => {
           )}
         </div>
 
-        {/* ✅ 5. GANTI BAGIAN INI - HAPUS RatingComponent LAMA DAN GANTI DENGAN RATING SYSTEM BARU: */}
         {/* Rating Section */}
         <div style={{ marginTop: "2rem" }}>
           {/* Article Rating Display */}
