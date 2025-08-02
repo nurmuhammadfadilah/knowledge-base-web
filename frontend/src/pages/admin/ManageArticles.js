@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { articleService, categoryService } from "../../services/articleService";
 import AdminLayout from "../../components/admin/AdminLayout";
+import Loading from "../../components/common/Loading";
 
 const ManageArticles = () => {
   const navigate = useNavigate();

@@ -5,6 +5,7 @@ import { articleService } from "../services/articleService";
 import RatingDisplay from "../components/rating/RatingDisplay";
 import RatingInput from "../components/rating/RatingInput";
 import { ratingService } from "../services/ratingService";
+import Loading from "../components/common/Loading";
 
 const ArticleDetail = () => {
   const { id } = useParams();
