@@ -33,7 +33,7 @@ const EditArticle = () => {
         const article = articleResponse.data;
         console.log("Raw article data:", article); // Debug log untuk melihat data mentah
 
-        const SUPABASE_URL = "https://vndrcukfbxwjbhebmtcy.supabase.co/storage/v1/object/public/article-images/";
+        const SUPABASE_URL = process.env.SUPABASE_STORAGE_URL;
         let imageUrls = [];
 
         try {
@@ -108,7 +108,7 @@ const EditArticle = () => {
   const handleImagesChange = (newImages) => {
     console.log("handleImagesChange received:", newImages); // Debug log
 
-    const SUPABASE_URL = "https://vndrcukfbxwjbhebmtcy.supabase.co/storage/v1/object/public/article-images/";
+    const SUPABASE_URL = process.env.SUPABASE_STORAGE_URL;
     let validImages = [];
 
     try {

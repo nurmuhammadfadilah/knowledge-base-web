@@ -200,7 +200,7 @@ router.get("/test", async (req, res) => {
         filesCount: files ? files.length : 0,
         recentFiles: files ? files.slice(0, 3).map((f) => f.name) : [],
         sampleUrl: files && files.length > 0 ? supabase.storage.from("article-images").getPublicUrl(files[0].name).data.publicUrl : null,
-        baseUrl: "https://vndrcukfbxwjbhebmtcy.supabase.co/storage/v1/object/public/article-images/",
+        baseUrl: process.env.SUPABASE_STORAGE_URL,
       },
     });
   } catch (error) {
