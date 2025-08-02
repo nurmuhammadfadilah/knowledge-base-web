@@ -16,6 +16,7 @@ const ArticleDetail = () => {
   const [userRating, setUserRating] = useState(null);
   const [ratings, setRatings] = useState([]);
   const [ratingStats, setRatingStats] = useState(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
     loadArticle();
@@ -67,8 +68,11 @@ const ArticleDetail = () => {
       // Reload data after submission
       await loadUserRating();
       await loadRatings();
+      await loadArticle();
       // Refresh article to get updated average rating
       await loadArticle();
+      setSubmitSuccess(true);
+      setTimeout(() => setSubmitSuccess(false), 3000);
     } catch (error) {
       console.error("Error submitting rating:", error);
       throw error;
@@ -166,7 +170,7 @@ const ArticleDetail = () => {
                 border: "none",
                 color: "var(--color-primary)",
                 cursor: "pointer",
-                textDecoration: "underline",
+                // textDecoration: "underline",
               }}
             >
               Home
@@ -246,6 +250,175 @@ const ArticleDetail = () => {
           </div>
         </header>
 
+        {/* Image Display */}
+        {article.image_url && (
+          <div style={{ margin: "1.5rem 0" }}>
+            {(() => {
+              // Parse the image URL if it's a JSON string
+              let imageUrls = article.image_url;
+              if (typeof imageUrls === "string") {
+                try {
+                  const parsed = JSON.parse(imageUrls);
+                  imageUrls = Array.isArray(parsed) ? parsed : [imageUrls];
+                } catch (e) {
+                  imageUrls = [imageUrls];
+                }
+              }
+
+              const filteredUrls = (Array.isArray(imageUrls) ? imageUrls : [imageUrls]).filter((url) => url && typeof url === "string" && url.trim() !== "");
+
+              const nextImage = () => {
+                setCurrentImageIndex((prev) => (prev + 1) % filteredUrls.length);
+              };
+
+              const prevImage = () => {
+                setCurrentImageIndex((prev) => (prev === 0 ? filteredUrls.length - 1 : prev - 1));
+              };
+
+              return filteredUrls.length > 0 ? (
+                <div style={{ position: "relative", width: "100%", height: "400px" }}>
+                  {/* Main Image */}
+                  <img
+                    src={filteredUrls[currentImageIndex].trim()}
+                    alt={`Article image ${currentImageIndex + 1} of ${filteredUrls.length}`}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "contain",
+                      borderRadius: "var(--radius-md)",
+                      backgroundColor: "var(--color-gray-100)",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => window.open(filteredUrls[currentImageIndex].trim(), "_blank")}
+                  />
+
+                  {/* Navigation Arrows - Only show if there's more than one image */}
+                  {filteredUrls.length > 1 && (
+                    <>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          prevImage();
+                        }}
+                        style={{
+                          position: "absolute",
+                          left: "10px",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          background: "rgba(0, 0, 0, 0.5)",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "50%",
+                          width: "40px",
+                          height: "40px",
+                          fontSize: "24px",
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          transition: "background-color 0.2s",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+                        }}
+                      >
+                        ‹
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          nextImage();
+                        }}
+                        style={{
+                          position: "absolute",
+                          right: "10px",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          background: "rgba(0, 0, 0, 0.5)",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "50%",
+                          width: "40px",
+                          height: "40px",
+                          fontSize: "24px",
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          transition: "background-color 0.2s",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+                        }}
+                      >
+                        ›
+                      </button>
+
+                      {/* Image Counter */}
+                      <div
+                        style={{
+                          position: "absolute",
+                          bottom: "10px",
+                          left: "50%",
+                          transform: "translateX(-50%)",
+                          background: "rgba(0, 0, 0, 0.5)",
+                          color: "white",
+                          padding: "4px 8px",
+                          borderRadius: "12px",
+                          fontSize: "14px",
+                        }}
+                      >
+                        {currentImageIndex + 1} / {filteredUrls.length}
+                      </div>
+
+                      {/* Thumbnail Navigation */}
+                      <div
+                        style={{
+                          position: "absolute",
+                          bottom: "-60px",
+                          left: "0",
+                          right: "0",
+                          display: "flex",
+                          gap: "8px",
+                          overflowX: "auto",
+                          padding: "4px",
+                        }}
+                      >
+                        {filteredUrls.map((url, index) => (
+                          <img
+                            key={index}
+                            src={url.trim()}
+                            alt={`Thumbnail ${index + 1}`}
+                            style={{
+                              width: "60px",
+                              height: "40px",
+                              objectFit: "cover",
+                              cursor: "pointer",
+                              border: index === currentImageIndex ? "2px solid var(--color-primary)" : "2px solid transparent",
+                              borderRadius: "4px",
+                              opacity: index === currentImageIndex ? 1 : 0.6,
+                              transition: "all 0.2s",
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setCurrentImageIndex(index);
+                            }}
+                          />
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+              ) : null;
+            })()}
+          </div>
+        )}
         {/* Article Body */}
         <div
           className="article-body"
@@ -380,7 +553,6 @@ const ArticleDetail = () => {
             </div>
           )}
         </div>
-
         {/* Back Button */}
         <div style={{ textAlign: "center", marginTop: "2rem" }}>
           <button

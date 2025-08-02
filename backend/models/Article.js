@@ -79,6 +79,7 @@ class Article {
             content: articleData.content,
             category_id: articleData.category_id,
             tags: articleData.tags || [],
+            image_url: articleData.image_url || null, // ✅ Menambahkan image_url
             view_count: 0,
             average_rating: 0,
           },
@@ -95,18 +96,19 @@ class Article {
 
   static async update(id, articleData) {
     try {
-      const { data, error } = await supabase
-        .from("articles")
-        .update({
-          title: articleData.title,
-          content: articleData.content,
-          category_id: articleData.category_id,
-          tags: articleData.tags,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", id)
-        .select()
-        .single();
+      const updateData = {
+        title: articleData.title,
+        content: articleData.content,
+        category_id: articleData.category_id,
+        tags: articleData.tags,
+        updated_at: new Date().toISOString(),
+      };
+
+      if (articleData.image_url !== undefined) {
+        updateData.image_url = articleData.image_url; // ✅ Update jika image_url ada
+      }
+
+      const { data, error } = await supabase.from("articles").update(updateData).eq("id", id).select().single();
 
       if (error) throw error;
       return { success: true, data };

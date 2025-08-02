@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { articleService, categoryService } from "../../services/articleService";
 import AdminLayout from "../../components/admin/AdminLayout";
+import ImageUpload from "../../components/admin/ImageUpload";
 
 const EditArticle = () => {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ const EditArticle = () => {
     content: "",
     category_id: "",
     tags: "",
+    image_url: [],
   });
   const [errors, setErrors] = useState({});
 
@@ -29,11 +31,66 @@ const EditArticle = () => {
 
       if (articleResponse.success && articleResponse.data) {
         const article = articleResponse.data;
+        console.log("Raw article data:", article); // Debug log untuk melihat data mentah
+
+        const SUPABASE_URL = "https://vndrcukfbxwjbhebmtcy.supabase.co/storage/v1/object/public/article-images/";
+        let imageUrls = [];
+
+        try {
+          if (article.image_url) {
+            let urlsToProcess = [];
+
+            // Handle different input formats
+            if (Array.isArray(article.image_url)) {
+              urlsToProcess = article.image_url;
+            } else if (typeof article.image_url === "string") {
+              if (article.image_url.startsWith("[")) {
+                try {
+                  const parsed = JSON.parse(article.image_url);
+                  urlsToProcess = Array.isArray(parsed) ? parsed : [article.image_url];
+                } catch (e) {
+                  console.error("Failed to parse JSON:", e);
+                  urlsToProcess = [article.image_url];
+                }
+              } else {
+                urlsToProcess = [article.image_url];
+              }
+            }
+
+            console.log("Processing URLs:", urlsToProcess);
+
+            // Clean and validate each URL
+            imageUrls = urlsToProcess
+              .filter((url) => url && typeof url === "string")
+              .map((url) => {
+                // Clean the URL
+                let cleanUrl = url.replace(/[\[\]"]/g, "").trim();
+
+                // Handle different URL formats
+                if (cleanUrl.includes("supabase.co")) {
+                  return cleanUrl; // Already a complete Supabase URL
+                }
+                if (cleanUrl.startsWith("http")) {
+                  return cleanUrl; // Another complete URL
+                }
+                return SUPABASE_URL + cleanUrl; // Add Supabase base URL
+              });
+
+            console.log("Processed URLs:", imageUrls);
+          }
+        } catch (err) {
+          console.error("Error processing image URLs:", err);
+          imageUrls = [];
+        }
+
+        console.log("Processed image URLs:", imageUrls); // Debug log
+
         setFormData({
           title: article.title || "",
           content: article.content || "",
           category_id: article.category_id || "",
           tags: article.tags ? article.tags.join(", ") : "",
+          image_url: imageUrls,
         });
       } else {
         setErrors({ general: "Article not found" });
@@ -46,6 +103,65 @@ const EditArticle = () => {
     } finally {
       setInitialLoading(false);
     }
+  };
+
+  const handleImagesChange = (newImages) => {
+    console.log("handleImagesChange received:", newImages); // Debug log
+
+    const SUPABASE_URL = "https://vndrcukfbxwjbhebmtcy.supabase.co/storage/v1/object/public/article-images/";
+    let validImages = [];
+
+    try {
+      let urlsArray = [];
+
+      // Handle different input formats
+      if (Array.isArray(newImages)) {
+        urlsArray = newImages;
+      } else if (typeof newImages === "string") {
+        if (newImages.startsWith("[")) {
+          try {
+            const parsed = JSON.parse(newImages);
+            urlsArray = Array.isArray(parsed) ? parsed : [newImages];
+          } catch (e) {
+            console.error("Failed to parse JSON:", e);
+            urlsArray = [newImages];
+          }
+        } else {
+          urlsArray = [newImages];
+        }
+      }
+
+      // Process and clean URLs
+      validImages = urlsArray
+        .filter((url) => url && typeof url === "string")
+        .map((url) => {
+          // Remove any extra quotes, brackets and whitespace
+          let cleanUrl = url.replace(/[\[\]"]/g, "").trim();
+
+          // If the URL is already a complete Supabase URL, use it as is
+          if (cleanUrl.includes("supabase.co")) {
+            return cleanUrl;
+          }
+
+          // If it's another complete URL, use it as is
+          if (cleanUrl.startsWith("http")) {
+            return cleanUrl;
+          }
+
+          // Otherwise, assume it's a filename and add the Supabase URL
+          return SUPABASE_URL + cleanUrl;
+        });
+
+      console.log("Processed URLs:", validImages);
+    } catch (e) {
+      console.error("Error processing image URLs:", e);
+      validImages = [];
+    }
+
+    setFormData({
+      ...formData,
+      image_url: validImages,
+    });
   };
 
   const handleChange = (e) => {
@@ -421,6 +537,31 @@ const EditArticle = () => {
               }}
             >
               Tags help users find your article more easily
+            </div>
+          </div>
+
+          {/* Images */}
+          <div style={{ marginBottom: "2rem" }}>
+            <label
+              style={{
+                display: "block",
+                color: "var(--color-gray-700)",
+                fontSize: "0.875rem",
+                fontWeight: "600",
+                marginBottom: "0.5rem",
+              }}
+            >
+              Images (Optional)
+            </label>
+            <ImageUpload images={formData.image_url} onImagesChange={handleImagesChange} maxImages={5} />
+            <div
+              style={{
+                fontSize: "0.75rem",
+                color: "var(--color-gray-500)",
+                marginTop: "0.25rem",
+              }}
+            >
+              Add images to illustrate your troubleshooting steps
             </div>
           </div>
 

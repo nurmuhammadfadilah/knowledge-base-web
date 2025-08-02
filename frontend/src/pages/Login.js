@@ -192,34 +192,6 @@ const Login = () => {
             {loading ? "Signing in..." : "Sign In"}
           </button>
         </form>
-
-        {/* Demo Credentials */}
-        <div
-          style={{
-            marginTop: "2rem",
-            padding: "1rem",
-            backgroundColor: "var(--color-gray-50)",
-            borderRadius: "var(--radius-md)",
-            fontSize: "0.875rem",
-          }}
-        >
-          {/* <p
-            style={{
-              color: "var(--color-gray-600)",
-              marginBottom: "0.5rem",
-              fontWeight: "600",
-            }}
-          >
-            Demo Credentials:
-          </p>
-          <p style={{ color: "var(--color-gray-600)" }}>
-            Username: <code>admin</code>
-            <br />
-            Password: <code>password123</code>
-          </p> */}
-        </div>
-
-        {/* Back to Home */}
         <div style={{ textAlign: "center", marginTop: "1rem" }}>
           <button
             type="button"

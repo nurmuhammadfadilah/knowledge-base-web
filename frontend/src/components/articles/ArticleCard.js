@@ -93,7 +93,6 @@ const ArticleCard = ({ article }) => {
       >
         {article.categories?.name || "Uncategorized"}
       </div>
-
       {/* Title */}
       <h3
         style={{
@@ -107,6 +106,49 @@ const ArticleCard = ({ article }) => {
         {article.title}
       </h3>
 
+      {/* Image Display */}
+      {article.image_url && (
+        <div style={{ margin: "1.5rem 0" }}>
+          {(() => {
+            // Parse the image URL if it's a JSON string
+            let imageUrls = article.image_url;
+            if (typeof imageUrls === "string") {
+              try {
+                const parsed = JSON.parse(imageUrls);
+                imageUrls = Array.isArray(parsed) ? parsed : [imageUrls];
+              } catch (e) {
+                imageUrls = [imageUrls];
+              }
+            }
+
+            const filteredUrls = (Array.isArray(imageUrls) ? imageUrls : [imageUrls]).filter((url) => url && typeof url === "string" && url.trim() !== "");
+
+            // Hanya tampilkan gambar pertama
+            const firstImage = filteredUrls[0];
+
+            return firstImage ? (
+              <img
+                src={firstImage.trim()}
+                alt="Article thumbnail"
+                onError={(e) => {
+                  console.error(`Failed to load image: ${firstImage}`);
+                  e.target.style.display = "none";
+                }}
+                style={{
+                  width: "100%",
+                  height: "200px",
+                  objectFit: "cover",
+                  borderRadius: "var(--radius-md)",
+                  border: "1px solid var(--color-gray-200)",
+                  cursor: "pointer",
+                }}
+                onClick={handleClick}
+              />
+            ) : null;
+          })()}
+        </div>
+      )}
+
       {/* Content Preview */}
       <p
         style={{
@@ -117,7 +159,6 @@ const ArticleCard = ({ article }) => {
       >
         {truncateContent(article.content)}
       </p>
-
       {/* Tags */}
       {article.tags && article.tags.length > 0 && (
         <div style={{ marginBottom: "1rem" }}>
@@ -140,7 +181,6 @@ const ArticleCard = ({ article }) => {
           ))}
         </div>
       )}
-
       {/* Footer */}
       <div
         style={{
@@ -171,7 +211,6 @@ const ArticleCard = ({ article }) => {
           <span>{article.view_count || 0} views</span>
         </div>
       </div>
-
       {/* Date */}
       <div
         style={{

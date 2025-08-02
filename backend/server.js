@@ -1,9 +1,11 @@
-// File: backend/server.js - UPDATE BAGIAN INI
+// File: backend/server.js
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
+const path = require("path");
 require("dotenv").config();
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -23,6 +25,11 @@ app.use(morgan("combined"));
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
+// ✅ STATIC FILES MIDDLEWARE - HARUS SEBELUM ROUTES
+// Serve uploaded images
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+console.log("✅ Static files middleware configured for /uploads");
+
 // Basic health check route
 app.get("/api/health", (req, res) => {
   res.json({
@@ -32,7 +39,16 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// Import dan gunakan routes
+// ✅ UPLOAD ROUTES - LOAD PERTAMA KALI
+try {
+  const uploadRoutes = require("./routes/upload");
+  app.use("/api/upload", uploadRoutes);
+  console.log("✅ Upload routes loaded");
+} catch (error) {
+  console.error("❌ Error loading upload routes:", error.message);
+}
+
+// Import dan gunakan routes lainnya
 try {
   const articleRoutes = require("./routes/articles");
   app.use("/api/articles", articleRoutes);
@@ -49,10 +65,10 @@ try {
   console.error("❌ Error loading category routes:", error.message);
 }
 
-// ✅ FIX RATING ROUTES - MOUNT DI /api BUKAN /api/ratings
+// ✅ RATING ROUTES - MOUNT DI /api BUKAN /api/ratings
 try {
   const ratingRoutes = require("./routes/ratings");
-  app.use("/api", ratingRoutes); // UBAH INI
+  app.use("/api", ratingRoutes);
   console.log("✅ Rating routes loaded");
 } catch (error) {
   console.error("❌ Error loading rating routes:", error.message);
@@ -66,21 +82,85 @@ try {
   console.error("❌ Error loading auth routes:", error.message);
 }
 
-// 404 handler
-app.use("*", (req, res) => {
-  res.status(404).json({ message: "Endpoint not found" });
+// ✅ TAMBAHAN: Test endpoint untuk cek upload folder
+app.get("/api/test-upload", (req, res) => {
+  const fs = require("fs");
+  const uploadDir = path.join(__dirname, "uploads", "images");
+
+  try {
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+      return res.json({
+        message: "Upload directory created",
+        path: uploadDir,
+      });
+    }
+
+    const files = fs.readdirSync(uploadDir);
+    res.json({
+      message: "Upload directory exists",
+      path: uploadDir,
+      files: files,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error checking upload directory",
+      error: error.message,
+    });
+  }
 });
 
-// Error handling
+// 404 handler
+app.use("*", (req, res) => {
+  res.status(404).json({ message: `Endpoint not found: ${req.method} ${req.originalUrl}` });
+});
+
+// Error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error("Error Stack:", err.stack);
+
+  // Handle multer errors (file upload errors)
+  if (err.code === "LIMIT_FILE_SIZE") {
+    return res.status(400).json({
+      message: "File too large. Maximum size is 5MB.",
+      error: "FILE_TOO_LARGE",
+    });
+  }
+
+  if (err.code === "LIMIT_FILE_COUNT") {
+    return res.status(400).json({
+      message: "Too many files. Maximum 5 files allowed.",
+      error: "TOO_MANY_FILES",
+    });
+  }
+
+  if (err.code === "LIMIT_UNEXPECTED_FILE") {
+    return res.status(400).json({
+      message: "Unexpected field in file upload.",
+      error: "UNEXPECTED_FIELD",
+    });
+  }
+
   res.status(500).json({
     message: "Something went wrong!",
     error: process.env.NODE_ENV === "development" ? err.message : "Internal server error",
   });
 });
 
+// ✅ STARTUP INFO
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📚 API Documentation: http://localhost:${PORT}/api/health`);
+  console.log(`📁 Upload folder: ${path.join(__dirname, "uploads")}`);
+  console.log(`🖼️  Image URL format: http://localhost:${PORT}/uploads/images/filename.jpg`);
+
+  // Check if uploads directory exists
+  const fs = require("fs");
+  const uploadDir = path.join(__dirname, "uploads", "images");
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+    console.log("✅ Created uploads/images directory");
+  } else {
+    console.log("✅ Uploads directory already exists");
+  }
 });

@@ -1,4 +1,4 @@
-// File: backend/config/database.js
+// File: backend/config/database.js - Update untuk pastikan storage access
 const { createClient } = require("@supabase/supabase-js");
 
 if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) {
@@ -20,6 +20,17 @@ const testConnection = async () => {
 
     if (error) throw error;
     console.log("✅ Database connected successfully");
+
+    // Test storage access
+    try {
+      const { data: buckets, error: storageError } = await supabase.storage.listBuckets();
+      if (storageError) throw storageError;
+      console.log("✅ Storage access verified");
+      console.log("📁 Available buckets:", buckets.map((b) => b.name).join(", "));
+    } catch (storageError) {
+      console.error("⚠️ Storage access limited:", storageError.message);
+    }
+
     return true;
   } catch (error) {
     console.error("❌ Database connection failed:", error.message);

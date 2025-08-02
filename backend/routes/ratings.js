@@ -1,23 +1,3 @@
-// // File: backend/routes/ratings.js
-// const express = require("express");
-// const router = express.Router();
-// const ratingController = require("../controllers/ratingController");
-// const { authenticateToken, optionalAuth } = require("../middleware/auth");
-
-// // Submit atau update rating (requires auth)
-// router.post("/articles/:articleId/ratings", authenticateToken, ratingController.submitRating);
-
-// // Get ratings untuk artikel (public)
-// router.get("/articles/:articleId/ratings", ratingController.getArticleRatings);
-
-// // Get user's rating untuk artikel (optional auth)
-// router.get("/articles/:articleId/ratings/me", optionalAuth, ratingController.getUserRating);
-
-// // Delete rating (requires auth)
-// router.delete("/articles/:articleId/ratings", authenticateToken, ratingController.deleteRating);
-
-// module.exports = router;
-// File: backend/routes/ratings.js
 const express = require("express");
 const router = express.Router();
 const ratingController = require("../controllers/ratingController");

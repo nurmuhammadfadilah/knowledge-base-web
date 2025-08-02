@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { articleService, categoryService } from "../../services/articleService";
 import AdminLayout from "../../components/admin/AdminLayout";
+import ImageUpload from "../../components/admin/ImageUpload";
 
 const CreateArticle = () => {
   const navigate = useNavigate();
@@ -13,6 +14,7 @@ const CreateArticle = () => {
     content: "",
     category_id: "",
     tags: "",
+    image_url: [],
   });
   const [errors, setErrors] = useState({});
 
@@ -27,6 +29,13 @@ const CreateArticle = () => {
     } catch (error) {
       console.error("Error loading categories:", error);
     }
+  };
+
+  const handleImagesChange = (newImages) => {
+    setFormData({
+      ...formData,
+      image_url: newImages,
+    });
   };
 
   const handleChange = (e) => {
@@ -360,6 +369,31 @@ const CreateArticle = () => {
               }}
             >
               Tags help users find your article more easily
+            </div>
+          </div>
+
+          {/* Images */}
+          <div style={{ marginBottom: "2rem" }}>
+            <label
+              style={{
+                display: "block",
+                color: "var(--color-gray-700)",
+                fontSize: "0.875rem",
+                fontWeight: "600",
+                marginBottom: "0.5rem",
+              }}
+            >
+              Images (Optional)
+            </label>
+            <ImageUpload images={formData.image_url} onImagesChange={handleImagesChange} maxImages={5} />
+            <div
+              style={{
+                fontSize: "0.75rem",
+                color: "var(--color-gray-500)",
+                marginTop: "0.25rem",
+              }}
+            >
+              Add images to illustrate your troubleshooting steps
             </div>
           </div>
 
