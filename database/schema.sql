@@ -1,5 +1,3 @@
--- File: database/schema.sql
-
 -- Tabel Categories
 CREATE TABLE categories (
     id SERIAL PRIMARY KEY,
