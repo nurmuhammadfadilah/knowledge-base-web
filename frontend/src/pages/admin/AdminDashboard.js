@@ -1,4 +1,3 @@
-// File: frontend/src/pages/admin/AdminDashboard.js
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { articleService, categoryService } from "../../services/articleService";
@@ -28,8 +27,6 @@ const AdminDashboard = () => {
 
       const articles = articlesResponse.data || [];
       const categories = categoriesResponse.data || [];
-
-      // Calculate stats
       const totalViews = articles.reduce((sum, article) => sum + (article.view_count || 0), 0);
       const averageRating = articles.length > 0 ? articles.reduce((sum, article) => sum + (article.average_rating || 0), 0) / articles.length : 0;
 

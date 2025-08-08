@@ -1,4 +1,3 @@
-// File: frontend/src/pages/admin/ManageArticles.js
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { articleService, categoryService } from "../../services/articleService";

@@ -1,7 +1,6 @@
 import React from "react";
 
 const Loading = ({ size = "medium", color = "var(--color-primary)" }) => {
-  // Size configurations
   const sizes = {
     small: {
       width: "20px",

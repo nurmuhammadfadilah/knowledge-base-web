@@ -1,4 +1,3 @@
-// File: backend/models/Article.js
 const { supabase } = require("../config/database");
 
 class Article {
@@ -17,7 +16,6 @@ class Article {
         )
         .order("created_at", { ascending: false });
 
-      // Apply filters
       if (filters.category_id) {
         query = query.eq("category_id", filters.category_id);
       }
@@ -57,7 +55,6 @@ class Article {
 
       if (error) throw error;
 
-      // Update view count
       await supabase
         .from("articles")
         .update({ view_count: (data.view_count || 0) + 1 })
@@ -105,7 +102,7 @@ class Article {
       };
 
       if (articleData.image_url !== undefined) {
-        updateData.image_url = articleData.image_url; // ✅ Update jika image_url ada
+        updateData.image_url = articleData.image_url;
       }
 
       const { data, error } = await supabase.from("articles").update(updateData).eq("id", id).select().single();

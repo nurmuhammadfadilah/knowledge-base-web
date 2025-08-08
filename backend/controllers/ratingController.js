@@ -1,19 +1,15 @@
-// File: backend/controllers/ratingController.js
 const { supabase } = require("../config/database");
 
 const ratingController = {
-  // Submit rating
   submitRating: async (req, res) => {
     try {
       const { article_id } = req.params;
       const { rating, feedback } = req.body;
 
-      // Get user IP
       const user_ip = req.ip || req.connection.remoteAddress || req.socket.remoteAddress || (req.connection.socket ? req.connection.socket.remoteAddress : "127.0.0.1");
 
       console.log("Rating submission:", { article_id, rating, feedback, user_ip });
 
-      // Validation
       if (!rating || rating < 1 || rating > 5) {
         return res.status(400).json({
           success: false,
@@ -21,7 +17,6 @@ const ratingController = {
         });
       }
 
-      // Check if article exists
       const { data: articleData, error: articleError } = await supabase.from("articles").select("id").eq("id", article_id).maybeSingle();
 
       if (articleError || !articleData) {
@@ -30,8 +25,6 @@ const ratingController = {
           message: "Article not found",
         });
       }
-
-      // Check if rating already exists for this IP and article
       const { data: existingRating, error: checkError } = await supabase.from("ratings").select("*").eq("article_id", article_id).eq("user_ip", user_ip).maybeSingle();
 
       if (checkError) throw checkError;
@@ -39,7 +32,6 @@ const ratingController = {
       let result;
 
       if (existingRating) {
-        // Update
         const { data, error } = await supabase
           .from("ratings")
           .update({
@@ -54,7 +46,6 @@ const ratingController = {
         if (error) throw error;
         result = data;
       } else {
-        // Insert
         const { data, error } = await supabase
           .from("ratings")
           .insert({
@@ -70,7 +61,6 @@ const ratingController = {
         result = data;
       }
 
-      // Update article average rating
       await updateArticleAverageRating(article_id);
 
       res.json({
@@ -88,7 +78,6 @@ const ratingController = {
     }
   },
 
-  // Get ratings for article
   getArticleRatings: async (req, res) => {
     try {
       const { article_id } = req.params;
@@ -97,23 +86,19 @@ const ratingController = {
       const from = (page - 1) * limit;
       const to = from + limit - 1;
 
-      // Get paginated ratings
       const { data: ratings, error } = await supabase.from("ratings").select("id, rating, feedback, created_at, user_ip").eq("article_id", article_id).order("created_at", { ascending: false }).range(from, to);
 
       if (error) throw error;
 
-      // Mask user IP
       const maskedRatings = ratings.map((r) => ({
         ...r,
         masked_ip: r.user_ip ? r.user_ip.substring(0, 3) + ".*.*.*" : "xxx.*.*.*",
       }));
 
-      // Get total
       const { count: total, error: countError } = await supabase.from("ratings").select("*", { count: "exact", head: true }).eq("article_id", article_id);
 
       if (countError) throw countError;
 
-      // Get distribution
       const { data: distributionData, error: distError } = await supabase.from("ratings").select("rating, count:rating").eq("article_id", article_id).group("rating");
 
       if (distError) throw distError;
@@ -141,7 +126,6 @@ const ratingController = {
     }
   },
 
-  // Get user's rating for article
   getUserRating: async (req, res) => {
     try {
       const { article_id } = req.params;
@@ -168,7 +152,6 @@ const ratingController = {
   },
 };
 
-// Helper: Update average and total rating
 async function updateArticleAverageRating(articleId) {
   try {
     const { data: ratings, error } = await supabase.from("ratings").select("rating").eq("article_id", articleId);

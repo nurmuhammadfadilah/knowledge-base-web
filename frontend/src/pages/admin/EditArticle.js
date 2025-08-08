@@ -1,4 +1,3 @@
-// File: frontend/src/pages/admin/EditArticle.js
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { articleService, categoryService } from "../../services/articleService";
@@ -31,8 +30,7 @@ const EditArticle = () => {
 
       if (articleResponse.success && articleResponse.data) {
         const article = articleResponse.data;
-        console.log("Raw article data:", article); // Debug log untuk melihat data mentah
-
+        console.log("Raw article data:", article);
         const SUPABASE_URL = process.env.SUPABASE_STORAGE_URL;
         let imageUrls = [];
 
@@ -40,7 +38,6 @@ const EditArticle = () => {
           if (article.image_url) {
             let urlsToProcess = [];
 
-            // Handle different input formats
             if (Array.isArray(article.image_url)) {
               urlsToProcess = article.image_url;
             } else if (typeof article.image_url === "string") {
@@ -57,23 +54,17 @@ const EditArticle = () => {
               }
             }
 
-            console.log("Processing URLs:", urlsToProcess);
-
-            // Clean and validate each URL
             imageUrls = urlsToProcess
               .filter((url) => url && typeof url === "string")
               .map((url) => {
-                // Clean the URL
                 let cleanUrl = url.replace(/[\[\]"]/g, "").trim();
-
-                // Handle different URL formats
                 if (cleanUrl.includes("supabase.co")) {
-                  return cleanUrl; // Already a complete Supabase URL
+                  return cleanUrl;
                 }
                 if (cleanUrl.startsWith("http")) {
-                  return cleanUrl; // Another complete URL
+                  return cleanUrl;
                 }
-                return SUPABASE_URL + cleanUrl; // Add Supabase base URL
+                return SUPABASE_URL + cleanUrl;
               });
 
             console.log("Processed URLs:", imageUrls);
@@ -83,7 +74,7 @@ const EditArticle = () => {
           imageUrls = [];
         }
 
-        console.log("Processed image URLs:", imageUrls); // Debug log
+        // console.log("Processed image URLs:", imageUrls);
 
         setFormData({
           title: article.title || "",
@@ -106,7 +97,7 @@ const EditArticle = () => {
   };
 
   const handleImagesChange = (newImages) => {
-    console.log("handleImagesChange received:", newImages); // Debug log
+    console.log("handleImagesChange received:", newImages);
 
     const SUPABASE_URL = process.env.SUPABASE_STORAGE_URL;
     let validImages = [];
@@ -114,7 +105,6 @@ const EditArticle = () => {
     try {
       let urlsArray = [];
 
-      // Handle different input formats
       if (Array.isArray(newImages)) {
         urlsArray = newImages;
       } else if (typeof newImages === "string") {
@@ -131,24 +121,17 @@ const EditArticle = () => {
         }
       }
 
-      // Process and clean URLs
       validImages = urlsArray
         .filter((url) => url && typeof url === "string")
         .map((url) => {
-          // Remove any extra quotes, brackets and whitespace
           let cleanUrl = url.replace(/[\[\]"]/g, "").trim();
 
-          // If the URL is already a complete Supabase URL, use it as is
           if (cleanUrl.includes("supabase.co")) {
             return cleanUrl;
           }
-
-          // If it's another complete URL, use it as is
           if (cleanUrl.startsWith("http")) {
             return cleanUrl;
           }
-
-          // Otherwise, assume it's a filename and add the Supabase URL
           return SUPABASE_URL + cleanUrl;
         });
 
@@ -171,7 +154,6 @@ const EditArticle = () => {
       [name]: value,
     });
 
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors({
         ...errors,

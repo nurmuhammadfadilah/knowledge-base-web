@@ -3,10 +3,9 @@ const router = express.Router();
 const ratingController = require("../controllers/ratingController");
 const rateLimit = require("express-rate-limit");
 
-// Rate limiting for rating submissions
 const ratingLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // Limit each IP to 5 rating requests per windowMs
+  windowMs: 15 * 60 * 1000,
+  max: 5,
   message: {
     success: false,
     message: "Too many rating attempts, please try again later",
@@ -16,10 +15,10 @@ const ratingLimiter = rateLimit({
 // Submit rating
 router.post("/articles/:article_id/rating", ratingLimiter, ratingController.submitRating);
 
-// Get ratings for article
+// Get
 router.get("/articles/:article_id/ratings", ratingController.getArticleRatings);
 
-// Get user's rating for article
+// Get user
 router.get("/articles/:article_id/user-rating", ratingController.getUserRating);
 
 module.exports = router;

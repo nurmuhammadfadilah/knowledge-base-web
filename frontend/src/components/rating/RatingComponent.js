@@ -1,4 +1,3 @@
-// File: frontend/src/components/rating/RatingComponent.js
 import React, { useState } from "react";
 
 const RatingComponent = ({ articleId, currentRating = 0 }) => {
@@ -12,13 +11,8 @@ const RatingComponent = ({ articleId, currentRating = 0 }) => {
 
     setIsSubmitting(true);
     try {
-      // TODO: Implement API call to submit rating
-      // await ratingService.submitRating(articleId, rating);
-
       setUserRating(rating);
       setHasRated(true);
-
-      // Simulate API delay
       setTimeout(() => {
         setIsSubmitting(false);
         alert(`Thank you for rating this article ${rating} stars!`);

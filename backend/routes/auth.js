@@ -1,4 +1,3 @@
-// File: backend/routes/auth.js
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
@@ -6,7 +5,6 @@ const jwt = require("jsonwebtoken");
 const { body, validationResult } = require("express-validator");
 const { supabase } = require("../config/database");
 
-// POST /api/auth/login - Admin login
 router.post("/login", [body("username").isLength({ min: 3 }).withMessage("Username must be at least 3 characters"), body("password").isLength({ min: 6 }).withMessage("Password must be at least 6 characters")], async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -15,8 +13,6 @@ router.post("/login", [body("username").isLength({ min: 3 }).withMessage("Userna
     }
 
     const { username, password } = req.body;
-
-    // Get user from database
     const { data: user, error } = await supabase.from("admin_users").select("*").eq("username", username).single();
 
     if (error || !user) {
@@ -26,7 +22,6 @@ router.post("/login", [body("username").isLength({ min: 3 }).withMessage("Userna
       });
     }
 
-    // Verify password
     const isPasswordValid = await bcrypt.compare(password, user.password_hash);
     if (!isPasswordValid) {
       return res.status(401).json({
@@ -35,7 +30,6 @@ router.post("/login", [body("username").isLength({ min: 3 }).withMessage("Userna
       });
     }
 
-    // Generate JWT token
     const token = jwt.sign(
       {
         userId: user.id,
@@ -67,7 +61,6 @@ router.post("/login", [body("username").isLength({ min: 3 }).withMessage("Userna
   }
 });
 
-// POST /api/auth/verify - Verify token
 router.post("/verify", async (req, res) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];
@@ -80,8 +73,6 @@ router.post("/verify", async (req, res) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    // Get fresh user data
     const { data: user, error } = await supabase.from("admin_users").select("id, username, email").eq("id", decoded.userId).single();
 
     if (error || !user) {
@@ -105,7 +96,6 @@ router.post("/verify", async (req, res) => {
   }
 });
 
-// POST /api/auth/logout
 router.post("/logout", (req, res) => {
   res.json({
     success: true,

@@ -1,4 +1,3 @@
-// File: frontend/src/services/ratingService.js
 import api from "./api";
 
 export const ratingService = {
@@ -14,7 +13,7 @@ export const ratingService = {
     }
   },
 
-  // Get article ratings
+  // Get artikel rating
   getArticleRatings: async (articleId, params = {}) => {
     try {
       const queryString = new URLSearchParams(params).toString();
@@ -26,7 +25,7 @@ export const ratingService = {
     }
   },
 
-  // Get user's rating
+  // Get rating yang diberikan user
   getUserRating: async (articleId) => {
     try {
       const response = await api.get(`/articles/${articleId}/user-rating`);

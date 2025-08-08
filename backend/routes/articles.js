@@ -1,11 +1,10 @@
-// File: backend/routes/articles.js
 const express = require("express");
 const router = express.Router();
 const Article = require("../models/Article");
 const authMiddleware = require("../middleware/auth");
 const { body, validationResult, query } = require("express-validator");
 
-// GET /api/articles - Get all articles with filtering
+// GET
 router.get("/", [query("category_id").optional().isInt(), query("search").optional().isLength({ min: 1, max: 100 }), query("limit").optional().isInt({ min: 1, max: 50 })], async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -35,7 +34,7 @@ router.get("/", [query("category_id").optional().isInt(), query("search").option
   }
 });
 
-// GET /api/articles/:id - Get single article
+// GET ID
 router.get("/:id", async (req, res) => {
   try {
     const result = await Article.getById(req.params.id);
@@ -53,7 +52,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// POST /api/articles - Create new article (Admin only - akan ditambah auth nanti)
+// POST
 router.post(
   "/",
   authMiddleware,
@@ -87,7 +86,7 @@ router.post(
   }
 );
 
-// PUT /api/articles/:id - Update article (Admin only)
+// PUT atau Update
 router.put("/:id", authMiddleware, [body("title").isLength({ min: 5, max: 255 }), body("content").isLength({ min: 20 }), body("category_id").isInt(), body("tags").optional().isArray()], async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -111,7 +110,7 @@ router.put("/:id", authMiddleware, [body("title").isLength({ min: 5, max: 255 })
   }
 });
 
-// DELETE /api/articles/:id - Delete article (Admin only)
+// DELETE
 router.delete("/:id", authMiddleware, async (req, res) => {
   try {
     const result = await Article.delete(req.params.id);

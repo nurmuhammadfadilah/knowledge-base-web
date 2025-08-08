@@ -1,4 +1,3 @@
-// File: frontend/src/pages/ArticleDetail.js
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { articleService } from "../services/articleService";
@@ -66,11 +65,9 @@ const ArticleDetail = () => {
   const handleRatingSubmit = async (ratingData) => {
     try {
       await ratingService.submitRating(id, ratingData);
-      // Reload data after submission
       await loadUserRating();
       await loadRatings();
       await loadArticle();
-      // Refresh article to get updated average rating
       await loadArticle();
       setSubmitSuccess(true);
       setTimeout(() => setSubmitSuccess(false), 3000);
@@ -255,7 +252,6 @@ const ArticleDetail = () => {
         {article.image_url && (
           <div style={{ margin: "1.5rem 0" }}>
             {(() => {
-              // Parse the image URL if it's a JSON string
               let imageUrls = article.image_url;
               if (typeof imageUrls === "string") {
                 try {
@@ -293,7 +289,7 @@ const ArticleDetail = () => {
                     onClick={() => window.open(filteredUrls[currentImageIndex].trim(), "_blank")}
                   />
 
-                  {/* Navigation Arrows - Only show if there's more than one image */}
+                  {/* Navigation Arrows */}
                   {filteredUrls.length > 1 && (
                     <>
                       <button
@@ -420,6 +416,7 @@ const ArticleDetail = () => {
             })()}
           </div>
         )}
+
         {/* Article Body */}
         <div
           className="article-body"

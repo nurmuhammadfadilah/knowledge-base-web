@@ -1,4 +1,3 @@
-// File: backend/config/database.js - Update untuk pastikan storage access
 const { createClient } = require("@supabase/supabase-js");
 
 if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) {
@@ -13,7 +12,6 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SER
   },
 });
 
-// Test connection - FIX: gunakan query yang benar
 const testConnection = async () => {
   try {
     const { data, error } = await supabase.from("categories").select("id").limit(1);
@@ -21,7 +19,6 @@ const testConnection = async () => {
     if (error) throw error;
     console.log("✅ Database connected successfully");
 
-    // Test storage access
     try {
       const { data: buckets, error: storageError } = await supabase.storage.listBuckets();
       if (storageError) throw storageError;
@@ -35,7 +32,6 @@ const testConnection = async () => {
   } catch (error) {
     console.error("❌ Database connection failed:", error.message);
 
-    // Coba alternatif - test dengan tabel lain atau buat tabel
     try {
       const { data: tableExists, error: tableError } = await supabase.from("categories").select("*").limit(0);
 
@@ -51,7 +47,6 @@ const testConnection = async () => {
   }
 };
 
-// Call test on startup
 testConnection();
 
 module.exports = { supabase, testConnection };

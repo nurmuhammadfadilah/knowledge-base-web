@@ -1,10 +1,8 @@
-// File: frontend/src/components/articles/SearchBar.js
 import React, { useState, useEffect } from "react";
 
 const SearchBar = ({ onSearch }) => {
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Debounce search to avoid too many API calls
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       onSearch(searchTerm);

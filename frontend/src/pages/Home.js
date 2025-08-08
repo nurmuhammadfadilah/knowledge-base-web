@@ -1,4 +1,3 @@
-// File: frontend/src/pages/Home.js
 import React, { useState, useEffect, useCallback } from "react";
 import { articleService, categoryService } from "../services/articleService";
 import ArticleCard from "../components/articles/ArticleCard";
@@ -13,7 +12,6 @@ const Home = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [error, setError] = useState(null);
 
-  // FIX: Use useCallback to prevent infinite re-renders
   const filterArticles = useCallback(async () => {
     try {
       const filters = {};
@@ -26,16 +24,14 @@ const Home = () => {
       console.error("Error filtering articles:", err);
       setError("Failed to filter articles. Please try again.");
     }
-  }, [searchTerm, selectedCategory]); // Dependencies untuk useCallback
+  }, [searchTerm, selectedCategory]);
 
   useEffect(() => {
     loadData();
   }, []);
 
-  // FIX: Sekarang filterArticles sudah di-wrap dengan useCallback
   useEffect(() => {
     if (categories.length > 0) {
-      // Only filter if categories are loaded
       filterArticles();
     }
   }, [filterArticles, categories.length]);
@@ -65,7 +61,7 @@ const Home = () => {
     setSelectedCategory(categoryId);
   }, []);
 
-  // Loading state
+  // Loading
   if (loading) {
     return (
       <div className="container" style={{ textAlign: "center", padding: "2rem" }}>

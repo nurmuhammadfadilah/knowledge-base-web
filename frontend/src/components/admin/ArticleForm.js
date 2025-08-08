@@ -42,7 +42,6 @@ const ArticleForm = ({ initialData, onSubmit, isLoading }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Convert tags string to array and trim whitespace
     const processedData = {
       ...formData,
       tags: formData.tags ? formData.tags.split(",").map((tag) => tag.trim()) : [],

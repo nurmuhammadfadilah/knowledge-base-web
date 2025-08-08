@@ -1,4 +1,3 @@
-// File: frontend/src/components/common/Navbar.js
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";

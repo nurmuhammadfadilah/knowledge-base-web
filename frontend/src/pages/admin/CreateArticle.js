@@ -1,4 +1,3 @@
-// File: frontend/src/pages/admin/CreateArticle.js
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { articleService, categoryService } from "../../services/articleService";
@@ -45,7 +44,6 @@ const CreateArticle = () => {
       [name]: value,
     });
 
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors({
         ...errors,

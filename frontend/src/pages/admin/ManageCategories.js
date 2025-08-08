@@ -1,4 +1,3 @@
-// File: frontend/src/pages/admin/ManageCategories.js
 import React, { useState, useEffect } from "react";
 import { categoryService } from "../../services/articleService";
 import AdminLayout from "../../components/admin/AdminLayout";
@@ -37,7 +36,6 @@ const ManageCategories = () => {
       [name]: value,
     });
 
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors({
         ...errors,
@@ -68,7 +66,6 @@ const ManageCategories = () => {
 
     try {
       if (editingCategory) {
-        // Update existing category
         const response = await categoryService.update(editingCategory.id, formData);
         if (response.success) {
           setCategories(categories.map((cat) => (cat.id === editingCategory.id ? { ...cat, ...formData } : cat)));
@@ -78,7 +75,6 @@ const ManageCategories = () => {
           setErrors({ general: response.message || "Failed to update category" });
         }
       } else {
-        // Create new category
         const response = await categoryService.create(formData);
         if (response.success) {
           setCategories([...categories, response.data]);

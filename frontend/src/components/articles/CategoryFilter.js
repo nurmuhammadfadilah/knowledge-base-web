@@ -1,4 +1,3 @@
-// File: frontend/src/components/articles/CategoryFilter.js
 import React from "react";
 
 const CategoryFilter = ({ categories, selectedCategory, onCategoryChange }) => {

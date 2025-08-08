@@ -1,4 +1,3 @@
-// File: frontend/src/components/admin/ImageUpload.js
 import React, { useState, useRef } from "react";
 import { uploadService } from "../../services/articleService";
 
@@ -7,8 +6,6 @@ const ImageUpload = ({ images, onImagesChange, maxImages = 5 }) => {
   const [dragOver, setDragOver] = useState(false);
   const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
-
-  // Memastikan images selalu array
   const imageList = Array.isArray(images) ? images : [];
 
   const handleFileSelect = async (files) => {
@@ -75,7 +72,6 @@ const ImageUpload = ({ images, onImagesChange, maxImages = 5 }) => {
       onImagesChange(newImages);
     } catch (error) {
       console.error("Delete error:", error);
-      // Still remove from UI even if server delete fails
       const newImages = imageList.filter((_, i) => i !== index);
       onImagesChange(newImages);
     }
@@ -90,8 +86,6 @@ const ImageUpload = ({ images, onImagesChange, maxImages = 5 }) => {
   const handleImageLoad = (e) => {
     console.log("Image loaded successfully:", e.target.src);
   };
-
-  // ... drag and drop handlers same as before ...
 
   const handleDrop = (e) => {
     e.preventDefault();

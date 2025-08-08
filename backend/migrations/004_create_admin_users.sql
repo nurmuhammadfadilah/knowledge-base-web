@@ -1,4 +1,3 @@
--- Tabel Admin Users
 CREATE TABLE admin_users (
     id SERIAL PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,

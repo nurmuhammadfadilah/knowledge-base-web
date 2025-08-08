@@ -1,8 +1,7 @@
-// File: frontend/src/services/articleService.js
 import api from "./api";
 
 export const articleService = {
-  // Get all articles with filters
+  // Get semua artikel
   getAll: async (params = {}) => {
     try {
       const queryString = new URLSearchParams(params).toString();
@@ -13,7 +12,7 @@ export const articleService = {
     }
   },
 
-  // Get article by ID
+  // Get artikel berdasarkan ID
   getById: async (id) => {
     try {
       const response = await api.get(`/articles/${id}`);
@@ -23,7 +22,7 @@ export const articleService = {
     }
   },
 
-  // Create new article (Admin only)
+  // Create artikel baru (hanya admin)
   create: async (articleData) => {
     try {
       const response = await api.post("/articles", articleData);
@@ -33,7 +32,7 @@ export const articleService = {
     }
   },
 
-  // Update article (Admin only)
+  // Update artikel (hanya admin)
   update: async (id, articleData) => {
     try {
       const response = await api.put(`/articles/${id}`, articleData);
@@ -43,7 +42,7 @@ export const articleService = {
     }
   },
 
-  // Delete article (Admin only)
+  // Delete artikel (hanya admin)
   delete: async (id) => {
     try {
       const response = await api.delete(`/articles/${id}`);
@@ -53,7 +52,7 @@ export const articleService = {
     }
   },
 
-  // Rate article
+  // Rate artikel
   rate: async (articleId, rating) => {
     try {
       const response = await api.post("/ratings", {
@@ -68,7 +67,7 @@ export const articleService = {
 };
 
 export const categoryService = {
-  // Get all categories
+  // Get semua kategori
   getAll: async () => {
     try {
       const response = await api.get("/categories");
@@ -78,7 +77,7 @@ export const categoryService = {
     }
   },
 
-  // Get category by ID
+  // Get kategori berdasarkan ID
   getById: async (id) => {
     try {
       const response = await api.get(`/categories/${id}`);
@@ -88,7 +87,7 @@ export const categoryService = {
     }
   },
 
-  // Create new category (Admin only)
+  // Create kategori (hanya admin)
   create: async (categoryData) => {
     try {
       const response = await api.post("/categories", categoryData);
@@ -98,7 +97,7 @@ export const categoryService = {
     }
   },
 
-  // Update category (Admin only)
+  // Update kategori (hanya admin)
   update: async (id, categoryData) => {
     try {
       const response = await api.put(`/categories/${id}`, categoryData);
@@ -108,7 +107,7 @@ export const categoryService = {
     }
   },
 
-  // Delete category (Admin only)
+  // Delete kategori (hanya admin)
   delete: async (id) => {
     try {
       const response = await api.delete(`/categories/${id}`);
@@ -119,15 +118,13 @@ export const categoryService = {
   },
 };
 
-// Upload Service - TAMBAHKAN INI
+// Upload image
 export const uploadService = {
-  // Upload single image
   uploadImage: async (file) => {
     try {
       const formData = new FormData();
       formData.append("image", file);
 
-      // Create axios instance tanpa Content-Type header untuk FormData
       const response = await api.post("/upload/image", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -139,7 +136,6 @@ export const uploadService = {
     }
   },
 
-  // Upload multiple images
   uploadImages: async (files) => {
     try {
       const formData = new FormData();
@@ -156,7 +152,6 @@ export const uploadService = {
     }
   },
 
-  // Delete image
   deleteImage: async (filename) => {
     try {
       const response = await api.delete(`/upload/image/${filename}`);
@@ -166,17 +161,15 @@ export const uploadService = {
     }
   },
 
-  // Get image URL - helper function
   getImageUrl: (filename) => {
     const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
-    const baseUrl = API_BASE_URL.replace("/api", ""); // Remove /api from end
+    const baseUrl = API_BASE_URL.replace("/api", "");
     return `${baseUrl}/uploads/images/${filename}`;
   },
 
-  // Validate image file
   validateImage: (file) => {
     const validTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"];
-    const maxSize = 5 * 1024 * 1024; // 5MB
+    const maxSize = 5 * 1024 * 1024;
 
     if (!validTypes.includes(file.type)) {
       throw new Error("Invalid file type. Only JPG, PNG, GIF, and WebP are allowed.");
@@ -189,7 +182,6 @@ export const uploadService = {
     return true;
   },
 
-  // Validate multiple images
   validateImages: (files) => {
     const maxFiles = 5;
 

@@ -1,4 +1,3 @@
-// File: frontend/src/components/articles/ArticleCard.js
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -110,7 +109,6 @@ const ArticleCard = ({ article }) => {
       {article.image_url && (
         <div style={{ margin: "1.5rem 0" }}>
           {(() => {
-            // Parse the image URL if it's a JSON string
             let imageUrls = article.image_url;
             if (typeof imageUrls === "string") {
               try {
@@ -122,8 +120,6 @@ const ArticleCard = ({ article }) => {
             }
 
             const filteredUrls = (Array.isArray(imageUrls) ? imageUrls : [imageUrls]).filter((url) => url && typeof url === "string" && url.trim() !== "");
-
-            // Hanya tampilkan gambar pertama
             const firstImage = filteredUrls[0];
 
             return firstImage ? (

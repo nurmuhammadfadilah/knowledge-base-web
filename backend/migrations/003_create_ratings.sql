@@ -1,4 +1,3 @@
--- Tabel Ratings
 CREATE TABLE ratings (
     id SERIAL PRIMARY KEY,
     article_id INTEGER REFERENCES articles(id) ON DELETE CASCADE,

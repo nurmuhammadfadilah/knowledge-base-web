@@ -77,7 +77,7 @@ npm start
 
 ## 🖼️ Fitur Tambahan
 
-- Upload gambar ke artikel menggunakan Cloudinary
+- Upload gambar ke artikel
 - Error handling pada proses rating
 - Artikel bisa difilter berdasarkan kategori
 

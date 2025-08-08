@@ -1,4 +1,3 @@
-// File: backend/routes/upload.js
 const express = require("express");
 const multer = require("multer");
 const path = require("path");
@@ -6,7 +5,6 @@ const { supabase } = require("../config/database");
 const authMiddleware = require("../middleware/auth");
 const router = express.Router();
 
-// Setup multer untuk memory storage (tidak save ke disk)
 const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
@@ -21,11 +19,10 @@ const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB limit
+    fileSize: 5 * 1024 * 1024,
   },
 });
 
-// Helper function untuk generate unique filename
 const generateFileName = (originalName) => {
   const timestamp = Date.now();
   const random = Math.round(Math.random() * 1e9);
@@ -46,7 +43,6 @@ const uploadToSupabase = async (file, filename) => {
       throw new Error(`Upload failed: ${error.message}`);
     }
 
-    // Get public URL
     const {
       data: { publicUrl },
     } = supabase.storage.from("article-images").getPublicUrl(filename);
@@ -62,7 +58,7 @@ const uploadToSupabase = async (file, filename) => {
   }
 };
 
-// POST /api/upload/image - Upload single image
+// POST
 router.post("/image", authMiddleware, upload.single("image"), async (req, res) => {
   try {
     if (!req.file) {
@@ -104,7 +100,6 @@ router.post("/image", authMiddleware, upload.single("image"), async (req, res) =
   }
 });
 
-// POST /api/upload/images - Upload multiple images
 router.post("/images", authMiddleware, upload.array("images", 5), async (req, res) => {
   try {
     if (!req.files || req.files.length === 0) {
@@ -146,7 +141,7 @@ router.post("/images", authMiddleware, upload.array("images", 5), async (req, re
   }
 });
 
-// DELETE /api/upload/image/:filename - Delete image from Supabase
+// DELETE
 router.delete("/image/:filename", authMiddleware, async (req, res) => {
   try {
     const { filename } = req.params;
@@ -176,19 +171,16 @@ router.delete("/image/:filename", authMiddleware, async (req, res) => {
   }
 });
 
-// GET /api/upload/test - Test Supabase connection
+// test
 router.get("/test", async (req, res) => {
   try {
-    // Test bucket access
     const { data: buckets, error: bucketError } = await supabase.storage.listBuckets();
 
     if (bucketError) {
       throw new Error(`Bucket access error: ${bucketError.message}`);
     }
 
-    // Test article-images bucket specifically
     const { data: files, error: filesError } = await supabase.storage.from("article-images").list("", { limit: 5 });
-
     const articleImagesBucket = buckets.find((bucket) => bucket.name === "article-images");
 
     res.json({

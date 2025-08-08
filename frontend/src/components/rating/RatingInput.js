@@ -1,4 +1,3 @@
-// File: frontend/src/components/rating/RatingInput.js - TAMBAHKAN ERROR HANDLING
 import React, { useState } from "react";
 
 const RatingInput = ({ onSubmit, initialRating = 0, initialFeedback = "", showSuccess = false }) => {
@@ -7,7 +6,6 @@ const RatingInput = ({ onSubmit, initialRating = 0, initialFeedback = "", showSu
   const [hoveredStar, setHoveredStar] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
-  // const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,8 +19,6 @@ const RatingInput = ({ onSubmit, initialRating = 0, initialFeedback = "", showSu
 
     try {
       await onSubmit({ rating, feedback });
-      // setSuccess(true);
-      // setTimeout(() => setSuccess(false), 3000);
     } catch (error) {
       console.error("Error submitting rating:", error);
       setError(error.response?.data?.message || "Failed to submit rating");

@@ -1,4 +1,3 @@
-// File: frontend/src/components/admin/AdminLayout.js
 import React from "react";
 import AdminSidebar from "./AdminSidebar";
 import AdminHeader from "./AdminHeader";

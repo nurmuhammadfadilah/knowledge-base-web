@@ -1,4 +1,3 @@
-// File: frontend/src/components/rating/RatingDisplay.js
 import React from "react";
 
 const RatingDisplay = ({ rating, totalRatings, size = "medium", showText = true }) => {

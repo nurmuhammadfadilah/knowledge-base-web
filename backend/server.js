@@ -1,4 +1,3 @@
-// File: backend/server.js
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
@@ -9,7 +8,6 @@ require("dotenv").config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ✅ TAMBAHKAN TRUST PROXY UNTUK IP DETECTION
 app.set("trust proxy", true);
 
 // Middleware
@@ -25,12 +23,11 @@ app.use(morgan("combined"));
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
-// ✅ STATIC FILES MIDDLEWARE - HARUS SEBELUM ROUTES
-// Serve uploaded images
+// Upload Image
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 console.log("✅ Static files middleware configured for /uploads");
 
-// Basic health check route
+// Check route
 app.get("/api/health", (req, res) => {
   res.json({
     message: "Troubleshooting KB API is running!",
@@ -39,7 +36,7 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// ✅ UPLOAD ROUTES - LOAD PERTAMA KALI
+// Upload Route
 try {
   const uploadRoutes = require("./routes/upload");
   app.use("/api/upload", uploadRoutes);
@@ -48,7 +45,7 @@ try {
   console.error("❌ Error loading upload routes:", error.message);
 }
 
-// Import dan gunakan routes lainnya
+// Import dan gunakan routes
 try {
   const articleRoutes = require("./routes/articles");
   app.use("/api/articles", articleRoutes);
@@ -65,7 +62,7 @@ try {
   console.error("❌ Error loading category routes:", error.message);
 }
 
-// ✅ RATING ROUTES - MOUNT DI /api BUKAN /api/ratings
+// Rating
 try {
   const ratingRoutes = require("./routes/ratings");
   app.use("/api", ratingRoutes);
@@ -82,7 +79,7 @@ try {
   console.error("❌ Error loading auth routes:", error.message);
 }
 
-// ✅ TAMBAHAN: Test endpoint untuk cek upload folder
+// Test
 app.get("/api/test-upload", (req, res) => {
   const fs = require("fs");
   const uploadDir = path.join(__dirname, "uploads", "images");
@@ -110,16 +107,14 @@ app.get("/api/test-upload", (req, res) => {
   }
 });
 
-// 404 handler
+// Error handling
 app.use("*", (req, res) => {
   res.status(404).json({ message: `Endpoint not found: ${req.method} ${req.originalUrl}` });
 });
 
-// Error handling middleware
 app.use((err, req, res, next) => {
   console.error("Error Stack:", err.stack);
 
-  // Handle multer errors (file upload errors)
   if (err.code === "LIMIT_FILE_SIZE") {
     return res.status(400).json({
       message: "File too large. Maximum size is 5MB.",
@@ -147,16 +142,14 @@ app.use((err, req, res, next) => {
   });
 });
 
-// ✅ STARTUP INFO
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📚 API Documentation: http://localhost:${PORT}/api/health`);
   console.log(`📁 Upload folder: ${path.join(__dirname, "uploads")}`);
-  console.log(`🖼️  Image URL format: http://localhost:${PORT}/uploads/images/filename.jpg`);
-
-  // Check if uploads directory exists
+  console.log(`🖼️ Image URL format: http://localhost:${PORT}/uploads/images/filename.jpg`);
   const fs = require("fs");
   const uploadDir = path.join(__dirname, "uploads", "images");
+
   if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
     console.log("✅ Created uploads/images directory");
