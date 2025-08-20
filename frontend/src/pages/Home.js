@@ -64,7 +64,7 @@ const Home = () => {
   // Loading
   if (loading) {
     return (
-      <div className="container" style={{ textAlign: "center", padding: "2rem" }}>
+      <div className="container" style={{ textAlign: "center", padding: "2rem 1rem" }}>
         <div
           style={{
             display: "inline-block",
@@ -91,7 +91,7 @@ const Home = () => {
   // Error state
   if (error) {
     return (
-      <div className="container" style={{ textAlign: "center", padding: "2rem" }}>
+      <div className="container" style={{ textAlign: "center", padding: "2rem 1rem" }}>
         <div
           style={{
             color: "var(--color-error)",
@@ -132,8 +132,27 @@ const Home = () => {
         }}
       >
         <div className="container" style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 1rem" }}>
-          <h1 style={{ fontSize: "2.5rem", marginBottom: "1rem", fontWeight: "700" }}>🔧 Troubleshooting Knowledge Base</h1>
-          <p style={{ fontSize: "1.2rem", opacity: "0.9" }}>Find solutions to common IT problems quickly and easily</p>
+          <h1
+            style={{
+              fontSize: "2.5rem",
+              marginBottom: "1rem",
+              fontWeight: "700",
+              lineHeight: "1.2",
+            }}
+          >
+            🔧 Troubleshooting Knowledge Base
+          </h1>
+          <p
+            style={{
+              fontSize: "1.2rem",
+              opacity: "0.9",
+              lineHeight: "1.4",
+              maxWidth: "600px",
+              margin: "0 auto",
+            }}
+          >
+            Find solutions to common IT problems quickly and easily
+          </p>
         </div>
       </div>
 
@@ -152,13 +171,13 @@ const Home = () => {
             flexWrap: "wrap",
           }}
         >
-          <div style={{ textAlign: "center" }}>
+          <div style={{ textAlign: "center", minWidth: "80px" }}>
             <div style={{ fontSize: "2rem", fontWeight: "700", color: "var(--color-primary)" }}>{articles.length}</div>
-            <div style={{ color: "var(--color-gray-600)" }}>Articles</div>
+            <div style={{ color: "var(--color-gray-600)", fontSize: "0.9rem" }}>Articles</div>
           </div>
-          <div style={{ textAlign: "center" }}>
+          <div style={{ textAlign: "center", minWidth: "80px" }}>
             <div style={{ fontSize: "2rem", fontWeight: "700", color: "var(--color-primary)" }}>{categories.length}</div>
-            <div style={{ color: "var(--color-gray-600)" }}>Categories</div>
+            <div style={{ color: "var(--color-gray-600)", fontSize: "0.9rem" }}>Categories</div>
           </div>
         </div>
 
@@ -180,15 +199,17 @@ const Home = () => {
           <div
             style={{
               textAlign: "center",
-              padding: "3rem",
+              padding: "3rem 1.5rem",
               color: "var(--color-gray-600)",
               backgroundColor: "var(--color-white)",
               borderRadius: "var(--radius-lg)",
               boxShadow: "var(--shadow-md)",
+              margin: "0 auto",
+              maxWidth: "500px",
             }}
           >
-            <h3 style={{ marginBottom: "1rem" }}>No articles found</h3>
-            <p>Try adjusting your search terms or category filter</p>
+            <h3 style={{ marginBottom: "1rem", fontSize: "1.25rem" }}>No articles found</h3>
+            <p style={{ marginBottom: "1rem", lineHeight: "1.5" }}>Try adjusting your search terms or category filter</p>
             {(searchTerm || selectedCategory) && (
               <button
                 onClick={() => {
@@ -197,12 +218,14 @@ const Home = () => {
                 }}
                 style={{
                   marginTop: "1rem",
-                  padding: "0.5rem 1rem",
+                  padding: "0.75rem 1.5rem",
                   backgroundColor: "var(--color-primary)",
                   color: "white",
                   border: "none",
                   borderRadius: "var(--radius-md)",
                   cursor: "pointer",
+                  fontSize: "1rem",
+                  fontWeight: "500",
                 }}
               >
                 Clear Filters
@@ -211,6 +234,102 @@ const Home = () => {
           </div>
         )}
       </div>
+
+      {/* Responsive Styles */}
+      <style>{`
+        /* Mobile phones (up to 480px) */
+        @media (max-width: 480px) {
+          .home-page .container {
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+          }
+          
+          /* Hero section mobile adjustments */
+          .home-page div[style*="padding: 3rem 0"] {
+            padding: 2rem 0 !important;
+          }
+          
+          .home-page h1[style*="fontSize: 2.5rem"] {
+            font-size: 1.8rem !important;
+            margin-bottom: 0.75rem !important;
+          }
+          
+          .home-page p[style*="fontSize: 1.2rem"] {
+            font-size: 1rem !important;
+            padding: 0 0.5rem;
+          }
+          
+          /* Articles grid mobile adjustment */
+          .home-page div[style*="gridTemplateColumns"] {
+            grid-template-columns: 1fr !important;
+            gap: 1rem !important;
+          }
+          
+          /* Stats section mobile */
+          .home-page div[style*="gap: 2rem"] {
+            gap: 1.5rem !important;
+          }
+          
+          /* No articles found section mobile */
+          .home-page div[style*="padding: 3rem 1.5rem"] {
+            padding: 2rem 1rem !important;
+          }
+        }
+        
+        /* Small tablets (481px to 768px) */
+        @media (min-width: 481px) and (max-width: 768px) {
+          .home-page .container {
+            padding-left: 1.5rem !important;
+            padding-right: 1.5rem !important;
+          }
+          
+          .home-page h1[style*="fontSize: 2.5rem"] {
+            font-size: 2.2rem !important;
+          }
+          
+          .home-page div[style*="gridTemplateColumns"] {
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
+            gap: 1.25rem !important;
+          }
+        }
+        
+        /* Medium tablets (769px to 1024px) */
+        @media (min-width: 769px) and (max-width: 1024px) {
+          .home-page div[style*="gridTemplateColumns"] {
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important;
+          }
+        }
+        
+        /* Ensure container max-width is respected on all devices */
+        @media (max-width: 1200px) {
+          .home-page .container[style*="maxWidth: 1200px"] {
+            margin: 0 auto !important;
+          }
+        }
+        
+        /* Additional mobile-friendly adjustments */
+        @media (max-width: 480px) {
+          /* Make buttons more touch-friendly */
+          .home-page button {
+            min-height: 44px;
+            padding: 0.75rem 1rem !important;
+          }
+          
+          /* Improve text readability on mobile */
+          .home-page p {
+            line-height: 1.5 !important;
+          }
+          
+          /* Ensure proper spacing for mobile */
+          .home-page div[style*="marginTop: 2rem"] {
+            margin-top: 1.5rem !important;
+          }
+          
+          .home-page div[style*="marginBottom: 2rem"] {
+            margin-bottom: 1.5rem !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };

@@ -119,11 +119,11 @@ const ArticleDetail = () => {
         style={{
           maxWidth: "800px",
           margin: "0 auto",
-          padding: "2rem 1rem",
+          padding: "1rem",
           textAlign: "center",
         }}
       >
-        <div style={{ color: "var(--color-error)", marginBottom: "1rem" }}>⚠️ {error}</div>
+        <div style={{ color: "var(--color-error)", marginBottom: "1rem", fontSize: "0.9rem" }}>⚠️ {error}</div>
         <button
           onClick={() => navigate("/")}
           style={{
@@ -134,6 +134,7 @@ const ArticleDetail = () => {
             borderRadius: "var(--radius-md)",
             cursor: "pointer",
             fontWeight: "600",
+            fontSize: "0.9rem",
           }}
         >
           ← Back to Home
@@ -148,7 +149,7 @@ const ArticleDetail = () => {
       <div
         style={{
           backgroundColor: "var(--color-gray-50)",
-          padding: "1rem 0",
+          padding: "0.75rem 0",
           borderBottom: "1px solid var(--color-gray-200)",
         }}
       >
@@ -160,7 +161,13 @@ const ArticleDetail = () => {
             padding: "0 1rem",
           }}
         >
-          <nav style={{ fontSize: "0.875rem", color: "var(--color-gray-600)" }}>
+          <nav
+            style={{
+              fontSize: "0.8rem",
+              color: "var(--color-gray-600)",
+              wordBreak: "break-word",
+            }}
+          >
             <button
               onClick={() => navigate("/")}
               style={{
@@ -168,15 +175,28 @@ const ArticleDetail = () => {
                 border: "none",
                 color: "var(--color-primary)",
                 cursor: "pointer",
-                // textDecoration: "underline",
+                padding: "0",
+                fontSize: "inherit",
               }}
             >
               Home
             </button>
             <span> / </span>
-            <span>{article.categories?.name}</span>
+            <span style={{ wordBreak: "break-word" }}>{article.categories?.name}</span>
             <span> / </span>
-            <span>{article.title}</span>
+            <span
+              style={{
+                wordBreak: "break-word",
+                display: "inline-block",
+                maxWidth: "200px",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                verticalAlign: "bottom",
+              }}
+            >
+              {article.title}
+            </span>
           </nav>
         </div>
       </div>
@@ -187,11 +207,11 @@ const ArticleDetail = () => {
         style={{
           maxWidth: "800px",
           margin: "0 auto",
-          padding: "2rem 1rem",
+          padding: "1rem",
         }}
       >
         {/* Article Header */}
-        <header style={{ marginBottom: "2rem" }}>
+        <header style={{ marginBottom: "1.5rem" }}>
           {/* Category Badge */}
           <div
             style={{
@@ -200,7 +220,7 @@ const ArticleDetail = () => {
               color: "white",
               padding: "0.5rem 1rem",
               borderRadius: "var(--radius-xl)",
-              fontSize: "0.875rem",
+              fontSize: "0.8rem",
               fontWeight: "600",
               marginBottom: "1rem",
             }}
@@ -212,10 +232,12 @@ const ArticleDetail = () => {
           <h1
             style={{
               color: "var(--color-secondary)",
-              fontSize: "2.5rem",
+              fontSize: "clamp(1.5rem, 4vw, 2.5rem)",
               fontWeight: "700",
               lineHeight: "1.2",
               marginBottom: "1rem",
+              wordBreak: "break-word",
+              hyphens: "auto",
             }}
           >
             {article.title}
@@ -225,25 +247,29 @@ const ArticleDetail = () => {
           <div
             style={{
               display: "flex",
-              flexWrap: "wrap",
-              gap: "1rem",
+              flexDirection: "column",
+              gap: "0.5rem",
               color: "var(--color-gray-600)",
-              fontSize: "0.875rem",
+              fontSize: "0.8rem",
               paddingBottom: "1rem",
               borderBottom: "2px solid var(--color-gray-100)",
             }}
           >
-            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              <span>📅</span>
-              <span>Updated: {formatDate(article.updated_at || article.created_at)}</span>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
+                <span>📅</span>
+                <span>Updated: {formatDate(article.updated_at || article.created_at)}</span>
+              </div>
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              <span>👁</span>
-              <span>{article.view_count || 0} views</span>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              <span>⭐</span>
-              <span>{article.average_rating?.toFixed(1) || "0.0"} rating</span>
+            <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
+                <span>👁</span>
+                <span>{article.view_count || 0} views</span>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
+                <span>⭐</span>
+                <span>{article.average_rating?.toFixed(1) || "0.0"} rating</span>
+              </div>
             </div>
           </div>
         </header>
@@ -273,143 +299,158 @@ const ArticleDetail = () => {
               };
 
               return filteredUrls.length > 0 ? (
-                <div style={{ position: "relative", width: "100%", height: "400px" }}>
+                <div style={{ position: "relative", width: "100%" }}>
                   {/* Main Image */}
-                  <img
-                    src={filteredUrls[currentImageIndex].trim()}
-                    alt={`Article image ${currentImageIndex + 1} of ${filteredUrls.length}`}
+                  <div
                     style={{
+                      position: "relative",
                       width: "100%",
-                      height: "100%",
-                      objectFit: "contain",
-                      borderRadius: "var(--radius-md)",
-                      backgroundColor: "var(--color-gray-100)",
-                      cursor: "pointer",
+                      height: "250px",
+                      "@media (min-width: 768px)": {
+                        height: "400px",
+                      },
                     }}
-                    onClick={() => window.open(filteredUrls[currentImageIndex].trim(), "_blank")}
-                  />
+                  >
+                    <img
+                      src={filteredUrls[currentImageIndex].trim()}
+                      alt={`Article image ${currentImageIndex + 1} of ${filteredUrls.length}`}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "contain",
+                        borderRadius: "var(--radius-md)",
+                        backgroundColor: "var(--color-gray-100)",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => window.open(filteredUrls[currentImageIndex].trim(), "_blank")}
+                    />
 
-                  {/* Navigation Arrows */}
-                  {filteredUrls.length > 1 && (
-                    <>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          prevImage();
-                        }}
-                        style={{
-                          position: "absolute",
-                          left: "10px",
-                          top: "50%",
-                          transform: "translateY(-50%)",
-                          background: "rgba(0, 0, 0, 0.5)",
-                          color: "white",
-                          border: "none",
-                          borderRadius: "50%",
-                          width: "40px",
-                          height: "40px",
-                          fontSize: "24px",
-                          cursor: "pointer",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          transition: "background-color 0.2s",
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
-                        }}
-                      >
-                        ‹
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          nextImage();
-                        }}
-                        style={{
-                          position: "absolute",
-                          right: "10px",
-                          top: "50%",
-                          transform: "translateY(-50%)",
-                          background: "rgba(0, 0, 0, 0.5)",
-                          color: "white",
-                          border: "none",
-                          borderRadius: "50%",
-                          width: "40px",
-                          height: "40px",
-                          fontSize: "24px",
-                          cursor: "pointer",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          transition: "background-color 0.2s",
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
-                        }}
-                      >
-                        ›
-                      </button>
+                    {/* Navigation Arrows */}
+                    {filteredUrls.length > 1 && (
+                      <>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            prevImage();
+                          }}
+                          style={{
+                            position: "absolute",
+                            left: "8px",
+                            top: "50%",
+                            transform: "translateY(-50%)",
+                            background: "rgba(0, 0, 0, 0.5)",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "50%",
+                            width: "35px",
+                            height: "35px",
+                            fontSize: "20px",
+                            cursor: "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            transition: "background-color 0.2s",
+                            zIndex: "2",
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+                          }}
+                        >
+                          ‹
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            nextImage();
+                          }}
+                          style={{
+                            position: "absolute",
+                            right: "8px",
+                            top: "50%",
+                            transform: "translateY(-50%)",
+                            background: "rgba(0, 0, 0, 0.5)",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "50%",
+                            width: "35px",
+                            height: "35px",
+                            fontSize: "20px",
+                            cursor: "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            transition: "background-color 0.2s",
+                            zIndex: "2",
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+                          }}
+                        >
+                          ›
+                        </button>
 
-                      {/* Image Counter */}
-                      <div
-                        style={{
-                          position: "absolute",
-                          bottom: "10px",
-                          left: "50%",
-                          transform: "translateX(-50%)",
-                          background: "rgba(0, 0, 0, 0.5)",
-                          color: "white",
-                          padding: "4px 8px",
-                          borderRadius: "12px",
-                          fontSize: "14px",
-                        }}
-                      >
-                        {currentImageIndex + 1} / {filteredUrls.length}
-                      </div>
+                        {/* Image Counter */}
+                        <div
+                          style={{
+                            position: "absolute",
+                            bottom: "8px",
+                            left: "50%",
+                            transform: "translateX(-50%)",
+                            background: "rgba(0, 0, 0, 0.5)",
+                            color: "white",
+                            padding: "4px 8px",
+                            borderRadius: "12px",
+                            fontSize: "12px",
+                            zIndex: "2",
+                          }}
+                        >
+                          {currentImageIndex + 1} / {filteredUrls.length}
+                        </div>
+                      </>
+                    )}
+                  </div>
 
-                      {/* Thumbnail Navigation */}
-                      <div
-                        style={{
-                          position: "absolute",
-                          bottom: "-60px",
-                          left: "0",
-                          right: "0",
-                          display: "flex",
-                          gap: "8px",
-                          overflowX: "auto",
-                          padding: "4px",
-                        }}
-                      >
-                        {filteredUrls.map((url, index) => (
-                          <img
-                            key={index}
-                            src={url.trim()}
-                            alt={`Thumbnail ${index + 1}`}
-                            style={{
-                              width: "60px",
-                              height: "40px",
-                              objectFit: "cover",
-                              cursor: "pointer",
-                              border: index === currentImageIndex ? "2px solid var(--color-primary)" : "2px solid transparent",
-                              borderRadius: "4px",
-                              opacity: index === currentImageIndex ? 1 : 0.6,
-                              transition: "all 0.2s",
-                            }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setCurrentImageIndex(index);
-                            }}
-                          />
-                        ))}
-                      </div>
-                    </>
+                  {/* Thumbnail Navigation - Only show on larger screens or when few images */}
+                  {filteredUrls.length > 1 && filteredUrls.length <= 5 && (
+                    <div
+                      style={{
+                        marginTop: "0.5rem",
+                        display: "flex",
+                        gap: "4px",
+                        overflowX: "auto",
+                        padding: "4px 0",
+                        justifyContent: "center",
+                      }}
+                    >
+                      {filteredUrls.map((url, index) => (
+                        <img
+                          key={index}
+                          src={url.trim()}
+                          alt={`Thumbnail ${index + 1}`}
+                          style={{
+                            width: "50px",
+                            height: "35px",
+                            objectFit: "cover",
+                            cursor: "pointer",
+                            border: index === currentImageIndex ? "2px solid var(--color-primary)" : "2px solid transparent",
+                            borderRadius: "4px",
+                            opacity: index === currentImageIndex ? 1 : 0.6,
+                            transition: "all 0.2s",
+                            flexShrink: "0",
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setCurrentImageIndex(index);
+                          }}
+                        />
+                      ))}
+                    </div>
                   )}
                 </div>
               ) : null;
@@ -422,17 +463,20 @@ const ArticleDetail = () => {
           className="article-body"
           style={{
             backgroundColor: "var(--color-white)",
-            padding: "2rem",
+            padding: "1rem",
             borderRadius: "var(--radius-lg)",
             boxShadow: "var(--shadow-md)",
-            marginBottom: "2rem",
+            marginBottom: "1.5rem",
           }}
         >
           <div
             style={{
               lineHeight: "1.7",
-              fontSize: "1.1rem",
+              fontSize: "1rem",
               color: "var(--color-gray-800)",
+              wordBreak: "break-word",
+              overflowWrap: "break-word",
+              textAlign: "justify",
             }}
           >
             {formatContent(article.content)}
@@ -442,7 +486,7 @@ const ArticleDetail = () => {
           {article.tags && article.tags.length > 0 && (
             <div
               style={{
-                marginTop: "2rem",
+                marginTop: "1.5rem",
                 paddingTop: "1rem",
                 borderTop: "1px solid var(--color-gray-200)",
               }}
@@ -451,14 +495,14 @@ const ArticleDetail = () => {
                 style={{
                   color: "var(--color-secondary)",
                   marginBottom: "0.75rem",
-                  fontSize: "0.875rem",
+                  fontSize: "0.8rem",
                   fontWeight: "600",
                   textTransform: "uppercase",
                 }}
               >
                 Tags
               </h4>
-              <div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
                 {article.tags.map((tag, index) => (
                   <span
                     key={index}
@@ -466,12 +510,11 @@ const ArticleDetail = () => {
                       display: "inline-block",
                       backgroundColor: "var(--color-gray-100)",
                       color: "var(--color-gray-700)",
-                      padding: "0.5rem 1rem",
+                      padding: "0.4rem 0.8rem",
                       borderRadius: "var(--radius-xl)",
-                      fontSize: "0.875rem",
-                      marginRight: "0.5rem",
-                      marginBottom: "0.5rem",
+                      fontSize: "0.8rem",
                       fontWeight: "500",
+                      wordBreak: "break-word",
                     }}
                   >
                     #{tag}
@@ -483,10 +526,10 @@ const ArticleDetail = () => {
         </div>
 
         {/* Rating Section */}
-        <div style={{ marginTop: "2rem" }}>
+        <div style={{ marginTop: "1.5rem" }}>
           {/* Article Rating Display */}
           {article.average_rating > 0 && (
-            <div style={{ marginBottom: "2rem" }}>
+            <div style={{ marginBottom: "1.5rem" }}>
               <RatingDisplay rating={article.average_rating} totalRatings={article.total_ratings || 0} size="large" />
             </div>
           )}
@@ -496,11 +539,12 @@ const ArticleDetail = () => {
 
           {/* Ratings List */}
           {ratings.length > 0 && (
-            <div style={{ marginTop: "2rem" }}>
+            <div style={{ marginTop: "1.5rem" }}>
               <h3
                 style={{
                   marginBottom: "1rem",
                   color: "var(--color-secondary)",
+                  fontSize: "1.2rem",
                 }}
               >
                 User Reviews ({ratingStats?.total || 0})
@@ -521,15 +565,17 @@ const ArticleDetail = () => {
                     style={{
                       display: "flex",
                       justifyContent: "space-between",
-                      alignItems: "center",
+                      alignItems: "flex-start",
                       marginBottom: "0.5rem",
+                      gap: "0.5rem",
                     }}
                   >
                     <RatingDisplay rating={rating.rating} totalRatings={0} showText={false} size="small" />
                     <span
                       style={{
-                        fontSize: "0.75rem",
+                        fontSize: "0.7rem",
                         color: "var(--color-gray-500)",
+                        flexShrink: "0",
                       }}
                     >
                       {new Date(rating.created_at).toLocaleDateString()}
@@ -540,7 +586,10 @@ const ArticleDetail = () => {
                       style={{
                         margin: "0",
                         color: "var(--color-gray-700)",
-                        fontSize: "0.875rem",
+                        fontSize: "0.85rem",
+                        lineHeight: "1.5",
+                        wordBreak: "break-word",
+                        overflowWrap: "break-word",
                       }}
                     >
                       {rating.feedback}
@@ -551,19 +600,22 @@ const ArticleDetail = () => {
             </div>
           )}
         </div>
+
         {/* Back Button */}
         <div style={{ textAlign: "center", marginTop: "2rem" }}>
           <button
             onClick={() => navigate("/")}
             style={{
-              padding: "0.75rem 2rem",
+              padding: "0.75rem 1.5rem",
               backgroundColor: "var(--color-secondary)",
               color: "white",
               border: "none",
               borderRadius: "var(--radius-md)",
               cursor: "pointer",
               fontWeight: "600",
-              fontSize: "1rem",
+              fontSize: "0.95rem",
+              width: "100%",
+              maxWidth: "300px",
             }}
           >
             ← Back to Articles
